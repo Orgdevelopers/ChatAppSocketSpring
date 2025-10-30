@@ -2,17 +2,9 @@ const msgerForm = get(".msger-inputarea");
 const msgerInput = get(".msger-input");
 const msgerChat = get(".msger-chat");
 
-const socketServer = "http://at-surgeon.gl.at.ply.gg:36199/chat-websocket";
+// const socketServer = "http://at-surgeon.gl.at.ply.gg:36199/chat-websocket";
+const socketServer = "http://localhost:8080/chat-websocket";
 
-const BOT_MSGS = [
-  "Hi, how are you?",
-  "Ohh... I can't understand what you trying to say. Sorry!",
-  "I like to play games... But I don't know how to play!",
-  "Sorry if my answers are not relevant. :))",
-  "I feel sleepy! :(",
-];
-
-// Icons made by Freepik from www.flaticon.com
 const BOT_IMG =
   "https://img.freepik.com/free-photo/designer-working-3d-model_23-2149371896.jpg?semt=ais_hybrid&w=740&q=80";
 const PERSON_IMG = "https://cdn-icons-png.flaticon.com/512/36/36183.png";
@@ -51,17 +43,6 @@ function appendMessage(name, img, side, text) {
   msgerChat.scrollTop += 500;
 }
 
-// function botResponse() {
-//   const r = random(0, BOT_MSGS.length - 1);
-//   const msgText = BOT_MSGS[r];
-//   const delay = msgText.split(" ").length * 100;
-
-//   setTimeout(() => {
-//     appendMessage(BOT_NAME, BOT_IMG, "left", msgText);
-//   }, delay);
-// }
-
-// Utils
 function get(selector, root = document) {
   return root.querySelector(selector);
 }
@@ -90,32 +71,24 @@ window.onload = function () {
   connect();
 };
 
-// ✅ Function to connect to WebSocket endpoint
 function connect() {
-  // Replace IP address with your PC IP (not localhost when using phone)
   var socket = new SockJS(socketServer);
   stompClient = Stomp.over(socket);
 
-  stompClient.connect({}, function (frame) {
-    showMessage("✅ Connected as " + username);
+  stompClient.connect({ username: "" + username }, function (frame) {
+    showLog("✅ Connected as " + username);
 
     // Subscribe to /topic/messages to receive messages broadcast from server
     stompClient.subscribe("/allChat/messages", function (messageOutput) {
       var message = JSON.parse(messageOutput.body);
-      console.log(message);
+      showLog(message);
+      handleMsg(message);
 
-      if (message.from != username) {
-        appendMessage(message.from, BOT_IMG, "left", message.text);
-      }
-      // showMessage(message);
     });
   });
 }
 
-// ✅ Function to send message to server
 function sendMessage(messageText) {
-  //let messageText = document.getElementById("messageInput").value.trim();
-
   if (messageText !== "") {
     stompClient.send(
       "/app/sendMessage",
@@ -128,7 +101,33 @@ function sendMessage(messageText) {
   }
 }
 
-// ✅ Display message in chat area
-function showMessage(message) {
+function handleMsg(message) {
+  if (message.broadcast) {
+    //msg is a broadcast from server
+    appendBroadcastMessage(message.text);
+
+  } else if (message.confettie) {
+    //msg is a confettie or animation
+
+  } else if (message.from != username) {
+    appendMessage(message.from, BOT_IMG, "left", message.text);
+  }
+}
+
+function appendBroadcastMessage(text) {
+  const chatArea = document.querySelector('.msger-chat');
+
+  const html = `
+    <div class="msg broadcast-msg">
+      ${text}
+    </div>
+  `;
+
+  chatArea.insertAdjacentHTML('beforeend', html);
+  chatArea.scrollTop = chatArea.scrollHeight; // Auto-scroll
+}
+
+
+function showLog(message) {
   console.log(message);
 }

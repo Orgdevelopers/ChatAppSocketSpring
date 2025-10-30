@@ -1,31 +1,40 @@
 package com.kulvinder.livechat.controllers;
 
 import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.handler.annotation.SendTo;
+import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
+import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.stereotype.Controller;
 
 import com.kulvinder.livechat.config.LottieAnimationConfig;
 import com.kulvinder.livechat.models.ChatMessage;
 
-@Controller  // ✅ Marks this class as a message-handling controller
+@Controller 
 public class ChatController {
 
-    @MessageMapping("/sendMessage")
-    // ✅ When the client sends message to /app/sendMessage, it comes here
+    private final SimpMessageSendingOperations messagingTemplate;
 
-    @SendTo("/allChat/messages")
-    // ✅ The return value of this method will be broadcast to all clients subscribed to /topic/messages
+    public ChatController(SimpMessageSendingOperations messagingTemplate) {
+        this.messagingTemplate = messagingTemplate;
+    }
+
+    @MessageMapping("/sendMessage")
+    public void sendMessage(ChatMessage chatMessage, SimpMessageHeaderAccessor headerAccessor) {
+        headerAccessor.getSessionAttributes().put("username", chatMessage.getFrom());
+
+        messagingTemplate.convertAndSend("/allChat/messages", chatMessage);
+    }
+
+    // @SendTo("/allChat/messages")
+
 
     public ChatMessage broadcastMessage(ChatMessage message) {
-        // ✅ This simply returns the same message that came from the client
-        // In future, we can add logic like timestamp, filtering, formatting, etc.
         System.out.println("Received Message: " + message.getText() + " from " + message.getFrom());
 
         if (message.getText().contains("party_popper")) {
             message.setConfettie(true);
             message.setAnimation(LottieAnimationConfig.party_popper);
 
-        }else{
+        } else {
             message.setConfettie(false);
         }
         return message;

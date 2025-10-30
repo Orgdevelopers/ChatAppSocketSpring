@@ -12,39 +12,15 @@ import lombok.NoArgsConstructor;
 public class ChatMessage {
     private String from; // Username of the sender
     private String text; // Message content
-    private String animation;
-    private Boolean confettie;
 
-    // ✅ Getters & Setters (required by Spring to map JSON automatically)
-    // public String getFrom() {
-    //     return from;
-    // }
+    @Builder.Default
+    private String animation = "none";
 
-    // public void setFrom(String from) {
-    //     this.from = from;
-    // }
+    @Builder.Default
+    private Boolean confettie = false;
 
-    // public String getText() {
-    //     return text;
-    // }
+    @Builder.Default
+    private Boolean broadcast = false;
 
-    // public void setText(String text) {
-    //     this.text = text;
-    // }
-
-    // public String getAnimation() {
-    //     return animation;
-    // }
-
-    // public void setAnimation(String animation) {
-    //     this.animation = animation;
-    // }
-
-    // public Boolean isConfettie() {
-    //     return confettie;
-    // }
-
-    // public void setConfettie(Boolean confettie) {
-    //     this.confettie = confettie;
-    // }
+    
 }
