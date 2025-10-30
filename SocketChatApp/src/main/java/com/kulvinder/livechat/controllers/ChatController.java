@@ -30,12 +30,10 @@ public class ChatController {
     public ChatMessage broadcastMessage(ChatMessage message) {
         System.out.println("Received Message: " + message.getText() + " from " + message.getFrom());
 
-        if (message.getText().contains("party_popper")) {
+        if (message.getText().contains(":party_popper:")) {
             message.setConfettie(true);
             message.setAnimation(LottieAnimationConfig.party_popper);
 
-        } else {
-            message.setConfettie(false);
         }
         return message;
     }

@@ -61,7 +61,7 @@ function random(min, max) {
 let stompClient = null;
 let username = null;
 
-// ✅ Ask for username when page loads
+// Ask for username when page loads
 window.onload = function () {
   username = prompt("Enter your username:");
   if (!username || username.trim() === "") {
@@ -76,14 +76,12 @@ function connect() {
   stompClient = Stomp.over(socket);
 
   stompClient.connect({ username: "" + username }, function (frame) {
-    showLog("✅ Connected as " + username);
+    showLog("Connected as " + username);
 
-    // Subscribe to /topic/messages to receive messages broadcast from server
     stompClient.subscribe("/allChat/messages", function (messageOutput) {
       var message = JSON.parse(messageOutput.body);
       showLog(message);
       handleMsg(message);
-
     });
   });
 }
@@ -105,17 +103,15 @@ function handleMsg(message) {
   if (message.broadcast) {
     //msg is a broadcast from server
     appendBroadcastMessage(message.text);
-
   } else if (message.confettie) {
     //msg is a confettie or animation
-
   } else if (message.from != username) {
     appendMessage(message.from, BOT_IMG, "left", message.text);
   }
 }
 
 function appendBroadcastMessage(text) {
-  const chatArea = document.querySelector('.msger-chat');
+  const chatArea = document.querySelector(".msger-chat");
 
   const html = `
     <div class="msg broadcast-msg">
@@ -123,10 +119,9 @@ function appendBroadcastMessage(text) {
     </div>
   `;
 
-  chatArea.insertAdjacentHTML('beforeend', html);
+  chatArea.insertAdjacentHTML("beforeend", html);
   chatArea.scrollTop = chatArea.scrollHeight; // Auto-scroll
 }
-
 
 function showLog(message) {
   console.log(message);
